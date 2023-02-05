@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,8 +41,15 @@ class _MyHomePageState extends State<MyHomePage> {
   File? selectedImage;
   final ImagePicker _picker = ImagePicker();
   dynamic res, thresh, im_bw, matrix;
+
   Future _getImage() async {
-    final pickedImage = await _picker.pickImage(source: ImageSource.camera);
+// You can request multiple permissions at once.
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.camera,
+      Permission.storage,
+      Permission.mediaLibrary,
+    ].request();
+    final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
     selectedImage = File(pickedImage!.path);
     setState(() {});
   }
