@@ -49,6 +49,17 @@ class _MyHomePageState extends State<MyHomePage> {
       Permission.storage,
       Permission.mediaLibrary,
     ].request();
+    final pickedImage = await _picker.pickImage(source: ImageSource.camera);
+    selectedImage = File(pickedImage!.path);
+    setState(() {});
+  }
+
+  Future _getImageGallery() async {
+// You can request multiple permissions at once.
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.storage,
+      Permission.mediaLibrary,
+    ].request();
     final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
     selectedImage = File(pickedImage!.path);
     setState(() {});
@@ -58,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final request = http.MultipartRequest(
         "POST",
         Uri.parse(
-            "https://803b-2407-54c0-1b10-6dcd-6756-70fb-9f56-89bb.in.ngrok.io/upload"));
+            "https://be5e-2407-54c0-1b10-be4-d486-aaea-3c-5795.in.ngrok.io/upload"));
     final headers = {"Content-type": "multipart/form-data"};
     request.files.add(http.MultipartFile('image',
         selectedImage!.readAsBytes().asStream(), selectedImage!.lengthSync(),
@@ -77,38 +88,64 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            selectedImage == null
-                ? Text("Please pick a image to scan")
-                : Image.file(selectedImage!),
-            TextButton.icon(
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.blue)),
-                onPressed: _scanImage,
-                icon: Icon(Icons.scanner_outlined, color: Colors.white),
-                label: Text(
-                  "Scan",
-                  style: TextStyle(color: Colors.white),
-                )),
-            Text(
-              'Character in Image',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            Text(
-              '$message',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              selectedImage == null
+                  ? Text("Please pick a image to scan")
+                  : Image.file(selectedImage!),
+              TextButton.icon(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.blue)),
+                  onPressed: _scanImage,
+                  icon: Icon(Icons.scanner_outlined, color: Colors.white),
+                  label: Text(
+                    "Scan",
+                    style: TextStyle(color: Colors.white),
+                  )),
+              Text(
+                'Text in Image',
+                style: Theme.of(context).textTheme.headline4,
+              ),
+              Text(
+                '$message',
+                style: Theme.of(context).textTheme.headline4,
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _getImage,
+        onPressed: () {
+          showModalBottomSheet<void>(
+              context: context,
+              builder: (BuildContext context) {
+                return SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        ElevatedButton(
+                          onPressed: _getImage,
+                          child: const Text('Image from Camera'),
+                        ),
+                        ElevatedButton(
+                          onPressed: _getImageGallery,
+                          child: const Text('Image from Gallery'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              });
+        },
         tooltip: 'getImage',
         child: const Icon(Icons.add_a_photo),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
